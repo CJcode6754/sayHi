@@ -1,6 +1,16 @@
 import { useState } from "react";
-import { Mail, MessageSquare, User, Eye, EyeOff } from "lucide-react";
+import {
+  Mail,
+  MessageSquare,
+  User,
+  Eye,
+  EyeOff,
+  Lock,
+  Loader2,
+} from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
+import { Link } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -13,11 +23,21 @@ const SignUpPage = () => {
   const { signup, isSigningUp } = useAuthStore();
 
   const validateForm = () => {
-    
+    if(!formData.fullName.trim()) return toast.error("Full name field is required");
+    if(!formData.email.trim()) return toast.error("Email field is required");
+    if (!/\S+@\S+\.\S+/.test(formData.email)) return toast.error("Invalid email format");
+    if(!formData.password) return toast.error("Password field is required");
+    if(formData.password.length < 6) return toast.error("Password must be at least 6 characters");
+
+    return true;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    const success = validateForm();
+
+    if(success === true) signup(formData);
   };
 
   return (
@@ -31,7 +51,9 @@ const SignUpPage = () => {
               <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-opacity-20 transition-all duration-200">
                 <MessageSquare className="w-6 h-6 text-primary" />
               </div>
-              <h1 className="text-2xl font-bold mt-2 text-base-content">Create Account</h1>
+              <h1 className="text-2xl font-bold mt-2 text-base-content">
+                Create Account
+              </h1>
               <p className="text-base-content text-opacity-70">
                 Get started with your free account
               </p>
@@ -39,15 +61,15 @@ const SignUpPage = () => {
           </div>
 
           {/* Form */}
-          <div className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
             {/* Full Name Input */}
             <div className="form-control">
               <label className="label">
                 <span className="label-text font-medium">Full Name</span>
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <User className="w-5 h-5 text-gray-400" />
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center z-10 pointer-events-none">
+                  <User className="w-5 h-5 text-base-content/40" />
                 </div>
                 <input
                   type="text"
@@ -67,8 +89,8 @@ const SignUpPage = () => {
                 <span className="label-text font-medium">Email Address</span>
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="w-5 h-5 text-base-content text-opacity-40" />
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center z-10 pointer-events-none">
+                  <Mail className="w-5 h-5 text-base-content/40" />
                 </div>
                 <input
                   type="email"
@@ -88,9 +110,12 @@ const SignUpPage = () => {
                 <span className="label-text font-medium">Password</span>
               </label>
               <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center z-10 pointer-events-none">
+                  <Lock className="w-5 h-5 text-base-content/40" />
+                </div>
                 <input
                   type={showPassword ? "text" : "password"}
-                  className="input input-bordered w-full pr-10 focus:input-primary"
+                  className="input input-bordered w-full pl-10 focus:input-primary"
                   placeholder="••••••••"
                   value={formData.password}
                   onChange={(e) =>
@@ -113,21 +138,28 @@ const SignUpPage = () => {
 
             {/* Submit Button */}
             <button
-              onClick={handleSubmit}
-              className={`btn btn-primary w-full ${isSigningUp ? 'loading' : ''}`}
-              disabled={isSigningUp || !validateForm()}
+              type="submit"
+              className="btn btn-primary w-full"
+              disabled={isSigningUp}
             >
-              {isSigningUp ? 'Creating Account...' : 'Create Account'}
+              {isSigningUp ? (
+                <>
+                  <Loader2 className="size-5 animate-spin" />
+                  Loading...
+                </>
+              ) : (
+                "Create Account"
+              )}
             </button>
-          </div>
+          </form>
 
           {/* Sign In Link */}
           <div className="text-center">
             <p className="text-base-content text-opacity-70">
-              Already have an account?{' '}
-              <a href="#" className="link link-primary font-medium">
+              Already have an account?{" "}
+              <Link to="/login" className="link link-primary font-medium">
                 Sign in
-              </a>
+              </Link>
             </p>
           </div>
         </div>

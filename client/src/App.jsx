@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import Navbar from "./components/Navbar";
 import { Navigate, Route, Routes } from "react-router-dom";
 import HomePage from "./pages/HomePage";
@@ -8,6 +8,8 @@ import SettingsPage from "./pages/SettingsPage";
 import ProfilePage from "./pages/ProfilePage";
 import { useAuthStore } from "./store/useAuthStore";
 import { Loader } from "lucide-react";
+import {Toaster} from 'react-hot-toast';
+
 
 function App() {
   const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
@@ -28,7 +30,7 @@ function App() {
   return (
     <div>
       <Navbar />
-
+      <Toaster/>
       <Routes>
         <Route path="/" element={authUser ? <HomePage /> :<Navigate to="/login" />} />
         <Route path="/signup" element={!authUser ? <SignUpPage /> : <Navigate to="/" />} />
